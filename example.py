@@ -1,3 +1,4 @@
+
 """
 Neural network example using MicroAutograd.
 
@@ -8,7 +9,7 @@ import sys
 import os
 import random
 import math
-from sklearn.datasets import make_moons, make_blobs
+from sklearn.datasets import make_moons
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -19,11 +20,11 @@ from micrograd.engine import Value
 from micrograd.nn import MLP
 from micrograd.optim import SGD
 
-def generate_spiral_data(n_points=100, n_classes=2, noise=0.1):
-    X, y = make_moons(n_samples=100, noise=0.1)
-    y = y*2
+def generate_data(n_samples=100, noise=0.1):
+    """Generate a simple dataset where the classes are easily separable"""
+    # Using make_moons with very low noise for better separation
+    X, y = make_moons(n_samples=n_samples, noise=noise, random_state=42)
     return X, y
-
 
 def plot_decision_boundary(model, X, y, title='Decision Boundary'):
     """
@@ -36,51 +37,37 @@ def plot_decision_boundary(model, X, y, title='Decision Boundary'):
         title: Plot title
     """
     # Set up a grid of points to evaluate the model
-    h = 0.05  # Step size in the mesh
-    margin = 0.5  # Margin around the data
-    x_min, x_max = X[:, 0].min() - margin, X[:, 0].max() + margin
-    y_min, y_max = X[:, 1].min() - margin, X[:, 1].max() + margin
+    h = 0.25
+    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
     xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
                          np.arange(y_min, y_max, h))
 
     # Create mesh of input points
-    mesh_points = np.c_[xx.ravel(), yy.ravel()]
+    Xmesh = np.c_[xx.ravel(), yy.ravel()]
 
-    # Evaluate model on all mesh points
-    Z = np.zeros(mesh_points.shape[0])
-    batch_size = 100  # Process in batches to avoid memory issues
+    # Create Value objects for each point and evaluate model
+    inputs = [list(map(Value, xrow)) for xrow in Xmesh]
+    scores = list(map(model, inputs))
 
-    for i in range(0, len(mesh_points), batch_size):
-        batch = mesh_points[i:i+batch_size]
-        for j, point in enumerate(batch):
-            # Convert to Value objects
-            x_val = Value(point[0])
-            y_val = Value(point[1])
-            # Forward pass and store output
-            pred = model([x_val, y_val])
-            Z[i+j] = pred.data
-
-    # Reshape back to grid
+    # Convert to binary decision (above or below 0)
+    Z = np.array([s[0].data > 0 if isinstance(s, list) else s.data > 0 for s in scores])
     Z = Z.reshape(xx.shape)
 
     # Plot the decision boundary and data points
     plt.figure(figsize=(10, 8))
 
-    # Decision boundary contour
-    contour = plt.contour(xx, yy, Z, levels=[0.5], colors='k', linestyles='-')
-
-    # Color regions
-    plt.contourf(xx, yy, Z, levels=[0, 0.5, 1], alpha=0.3,
-                 colors=['#FFAAAA', '#AAAAFF'])
+    # Color regions using spectral colormap
+    plt.contourf(xx, yy, Z, cmap=plt.cm.Spectral, alpha=0.8)
 
     # Data points
-    plt.scatter(X[y==0, 0], X[y==0, 1], c='red', edgecolors='k', s=50, label='Class 0')
-    plt.scatter(X[y==1, 0], X[y==1, 1], c='blue', edgecolors='k', s=50, label='Class 1')
+    plt.scatter(X[:, 0], X[:, 1], c=y, s=40, cmap=plt.cm.Spectral, edgecolors='k')
 
+    plt.xlim(xx.min(), xx.max())
+    plt.ylim(yy.min(), yy.max())
     plt.title(title)
     plt.xlabel('X1')
     plt.ylabel('X2')
-    plt.legend()
     plt.savefig('decision_boundary.png')
     plt.close()
 
@@ -88,19 +75,19 @@ def main():
     """Run the neural network example."""
     print("=== Neural Network Example ===")
 
-    # Generate a simple binary classification dataset (spiral)
-    X, y = generate_spiral_data(n_points=100, n_classes=2, noise=0.1)
+    # Generate a dataset with very low noise for better separation
+    X, y = generate_data(n_samples=100, noise=0.01)
 
-    # Create a neural network: 2 inputs -> 16 hidden -> 8 hidden -> 1 output
-    # Multiple layers help with nonlinear decision boundaries
-    model = MLP(nin=2, nouts=[16, 16, 1])
+    # Create a neural network with more capacity: 2 inputs -> 32 -> 32 -> 16 -> 1 output
+    # Using a deeper network for better representation power
+    model = MLP(nin=2, nouts=[32, 32, 16, 1])
 
     # Create an optimizer with appropriate learning rate
-    optimizer = SGD(model.parameters(), lr=0.1)
+    optimizer = SGD(model.parameters(), lr=0.005)
 
     # Training parameters
-    n_epochs = 100
-    batch_size = 32
+    n_epochs = 500  # More epochs for better convergence
+    batch_size = 10  # Smaller batch size for better generalization
 
     # Lists to track progress
     losses = []
@@ -135,22 +122,23 @@ def main():
 
                 # Forward pass
                 pred = model(x_vals)
+                pred_value = pred[0] if isinstance(pred, list) else pred
 
-                # Compute loss: binary cross-entropy (more appropriate for classification)
-                target = 1.0 if y[idx] == 1 else -1.0  # Use -1/1 targets for better tanh performance
-                # Use a margin loss: maximize correct class score by at least margin
-                margin = 1.0
-                loss = (margin - pred.data * target)**2
+                # Binary cross-entropy loss with tanh activation
+                target = 1.0 if y[idx] == 1 else -1.0  # Use -1/1 targets for tanh
+
+                # Use MSE loss which works better for this dataset
+                loss = (pred_value - target) * (pred_value - target)
 
                 # Accumulate loss
                 batch_loss = batch_loss + loss
 
-                # Check accuracy (with tanh activation, output is close to -1 or 1)
-                pred_class = 1 if pred.data > 0 else 0
+                # Check accuracy
+                pred_class = 1 if pred_value.data > 0 else 0
                 if pred_class == y[idx]:
                     correct += 1
 
-            # Average loss over the batch
+            # Scale loss by batch size
             batch_loss = batch_loss * (1.0 / len(batch_indices))
 
             # Backward pass
@@ -163,7 +151,7 @@ def main():
             total_loss += batch_loss.data
 
         # Record metrics
-        avg_loss = total_loss / (len(X) / batch_size)
+        avg_loss = total_loss / max(1, (len(X) // batch_size))
         accuracy = correct / len(X)
         losses.append(avg_loss)
         accuracies.append(accuracy)
@@ -171,6 +159,11 @@ def main():
         # Print progress every 10 epochs
         if (epoch + 1) % 10 == 0:
             print(f"Epoch {epoch+1}/{n_epochs}: Loss={avg_loss:.4f}, Accuracy={accuracy:.4f}")
+
+        # Early stopping if we reach perfect accuracy
+        if accuracy == 1.0 and avg_loss < 0.01:
+            print(f"Early stopping at epoch {epoch+1} with 100% accuracy!")
+            break
 
     # Plot training progress
     plt.figure(figsize=(12, 5))
@@ -197,13 +190,6 @@ def main():
     # Plot decision boundary
     plot_decision_boundary(model, X, y, title='Neural Network Decision Boundary')
     print("Decision boundary plot saved to 'decision_boundary.png'")
-
-    # Visualize the computation graph for a single prediction
-    print("Generating computation graph visualization...")
-    x_sample = [Value(X[0][0], label='x1'), Value(X[0][1], label='x2')]
-    pred = model(x_sample)
-    # draw_dot(pred, filename='neural_network_graph')
-    # print("Visualization saved to 'neural_network_graph.png'")
 
 if __name__ == "__main__":
     main()

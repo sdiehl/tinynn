@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from micrograd.engine import Value
 from micrograd.nn import MLP
-# from micrograd.viz import visualize
+from micrograd.viz import visualize
 
 def demo_basic_operations():
     """Demonstrate basic autograd operations"""
@@ -39,8 +39,8 @@ def demo_basic_operations():
     print(f"f.grad = {f.grad}")
 
     # Visualize the computation graph
-    # print("\nGenerating computation graph visualization...")
-    # visualize(f, "basic_operations_graph")
+    print("\nGenerating computation graph visualization...")
+    visualize(f, "basic_operations_graph")
 
 def demo_simple_neural_network():
     """Demonstrate a very simple neural network without external data"""
@@ -87,8 +87,8 @@ def demo_simple_neural_network():
     print(f"New loss: {loss.data}")
 
     # Visualize the computation graph
-    # print("\nGenerating computation graph visualization...")
-    # visualize(loss, "neural_network_graph")
+    print("\nGenerating computation graph visualization...")
+    visualize(loss, "neural_network_graph")
 
 def main():
     """Main function to demonstrate MicroAutograd functionality"""
