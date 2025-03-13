@@ -25,6 +25,7 @@ jobs:
     
     - name: Install dependencies
       run: |
+        mkdir -p output
         uv pip install --system .
         uv pip install --system ".[dev]"
     

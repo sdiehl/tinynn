@@ -17,3 +17,6 @@ dev = [
     "mypy>=1.15.0",
     "ruff>=0.9.10",
 ]
+
+[tool.setuptools]
+packages = ["tinynn"]
