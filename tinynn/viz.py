@@ -2,9 +2,9 @@
 Visualization utilities for drawing computation graphs.
 """
 
-import sys
+from io import StringIO
 import networkx as nx  # type: ignore
-from networkx.drawing.nx_pydot import write_dot, graphviz_layout  # type: ignore
+from networkx.drawing.nx_pydot import write_dot  # type: ignore
 import matplotlib.pyplot as plt
 
 
@@ -85,7 +85,7 @@ def draw_dot(root, output_file=None, format="png"):
     return G
 
 
-def visualize(root, name="computation_graph", show=True):
+def visualize(root, name="computation_graph", show=True) -> str:
     """
     Visualizes a computation graph and saves it to a file.
 
@@ -98,47 +98,7 @@ def visualize(root, name="computation_graph", show=True):
 
     plt.figure(figsize=(12, 8))
 
-    # Get node labels and shapes
-    node_labels = nx.get_node_attributes(G, "label")
-    node_shapes = nx.get_node_attributes(G, "shape")
-
-    write_dot(G, sys.stdout)
-
-    return
-
-    # Use graphviz_layout for better tree layout
-    pos = graphviz_layout(G, prog="dot")
-
-    # Draw nodes with different shapes
-    box_nodes = [n for n, s in node_shapes.items() if s == "box"]
-    ellipse_nodes = [n for n, s in node_shapes.items() if s == "ellipse"]
-
-    # Draw the graph
-    nx.draw_networkx_nodes(
-        G,
-        pos,
-        nodelist=box_nodes,
-        node_color="lightblue",
-        node_size=2000,
-        node_shape="s",
-    )
-    nx.draw_networkx_nodes(
-        G,
-        pos,
-        nodelist=ellipse_nodes,
-        node_color="lightgreen",
-        node_size=1500,
-        node_shape="o",
-    )
-    nx.draw_networkx_edges(G, pos, arrows=True, arrowsize=20)
-    nx.draw_networkx_labels(G, pos, labels=node_labels, font_size=8)
-
-    plt.axis("off")
-
-    if name:
-        plt.savefig(f"{name}.png", format="png", dpi=300, bbox_inches="tight")
-
-    if show:
-        plt.show()
-
-    return G
+    # Capture the output of the dot command
+    out = StringIO()
+    write_dot(G, out)
+    return out.getvalue()

@@ -1,16 +1,7 @@
-"""
-Toy neural network example
-"""
-
-import sys
-import os
 import random
 from sklearn.datasets import make_moons
 import numpy as np
 import matplotlib.pyplot as plt
-
-# Add the parent directory to the path so we can import our library
-sys.path.append(os.path.abspath("."))
 
 from tinynn.engine import Value
 from tinynn.nn import MLP
@@ -18,22 +9,11 @@ from tinynn.optim import SGD
 
 
 def generate_data(n_samples=100, noise=0.1):
-    """Generate a simple dataset where the classes are easily separable"""
-    # Using make_moons with very low noise for better separation
     X, y = make_moons(n_samples=n_samples, noise=noise, random_state=42)
     return X, y
 
 
 def plot_decision_boundary(model, X, y, title="Decision Boundary"):
-    """
-    Plot the decision boundary of a binary classifier.
-
-    Args:
-        model: The trained model that takes 2D inputs and outputs a scalar
-        X: Input features (2D points)
-        y: Labels (class indices)
-        title: Plot title
-    """
     # Set up a grid of points to evaluate the model
     h = 0.25
     x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
@@ -65,7 +45,7 @@ def plot_decision_boundary(model, X, y, title="Decision Boundary"):
     plt.title(title)
     plt.xlabel("X1")
     plt.ylabel("X2")
-    plt.savefig("decision_boundary.png")
+    plt.savefig("output/decision_boundary.png")
     plt.close()
 
 
@@ -76,8 +56,7 @@ def main():
     # Generate a dataset with very low noise for better separation
     X, y = generate_data(n_samples=100, noise=0.01)
 
-    # Create a neural network with more capacity: 2 inputs -> 32 -> 32 -> 16 -> 1 output
-    # Using a deeper network for better representation power
+    # Create a neural network 2 inputs -> 32 -> 32 -> 16 -> 1 output
     model = MLP(nin=2, nouts=[32, 32, 16, 1])
 
     # Create an optimizer with appropriate learning rate
@@ -181,7 +160,7 @@ def main():
     plt.ylabel("Accuracy")
 
     plt.tight_layout()
-    plt.savefig("training_progress.png")
+    plt.savefig("output/training_progress.png")
     plt.close()
 
     print("Training complete!")

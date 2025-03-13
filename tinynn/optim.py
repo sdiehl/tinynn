@@ -11,8 +11,6 @@ class SGD:
 
     def step(self):
         """
-        Perform one optimization step using gradient descent.
-
         Updates each parameter as: p = p - lr * p.grad
         """
         for p in self.parameters:

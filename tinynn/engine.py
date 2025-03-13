@@ -1,11 +1,7 @@
-"""
-Engine for automatic differentiation.
-"""
+import math
 
 
 class Value:
-    """stores a single scalar value and its gradient"""
-
     def __init__(self, data, _children=(), _op="", label=""):
         self.data = data
         self.grad = 0
@@ -63,7 +59,6 @@ class Value:
         return out
 
     def tanh(self):
-        import math
 
         x = self.data
         t = math.tanh(x)
@@ -77,8 +72,6 @@ class Value:
         return out
 
     def exp(self):
-        import math
-
         x = self.data
         out = Value(math.exp(x), (self,), "exp")
 
@@ -90,8 +83,6 @@ class Value:
         return out
 
     def sigmoid(self):
-        import math
-
         x = self.data
         sig = 1 / (1 + math.exp(-x))
         out = Value(sig, (self,), "sigmoid")
