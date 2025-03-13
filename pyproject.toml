@@ -7,7 +7,6 @@ dependencies = [
     "matplotlib>=3.10.1",
     "networkx>=3.4.2",
     "numpy>=2.2.3",
-    "pydot>=3.0.4",
     "scikit-learn>=1.6.1",
 ]
 
