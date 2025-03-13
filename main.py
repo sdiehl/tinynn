@@ -90,6 +90,18 @@ def demo_simple_neural_network():
     print("\nGenerating computation graph visualization...")
     visualize(loss, "neural_network_graph")
 
+def demo_nn_architecture():
+    from tinynn.viz_nn import visualize_mlp, visualize_network
+
+    # Visualize a specific network structure
+    visualize_network([2, 32, 32, 16, 1], save_path="network_architecture.png")
+
+    # Or visualize an existing MLP model
+    model = MLP(nin=2, nouts=[32, 32, 16, 1])
+    visualize_mlp(model, save_path="model_architecture.png")
+
+    model = MLP(nin=2, nouts=[8, 8, 1])
+    visualize_mlp(model, save_path="model_architecture.png")
 
 def main():
     # Run the basic operations demo
@@ -97,6 +109,9 @@ def main():
 
     # Run the simple neural network demo
     demo_simple_neural_network()
+
+    # Run the neural network architecture demo
+    demo_nn_architecture()
 
 
 if __name__ == "__main__":
