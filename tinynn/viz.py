@@ -2,7 +2,10 @@
 Visualization utilities for drawing computation graphs.
 """
 
-from graphviz import Digraph
+import sys
+import networkx as nx  # type: ignore
+from networkx.drawing.nx_pydot import write_dot, graphviz_layout  # type: ignore
+import matplotlib.pyplot as plt
 
 
 def trace(root):
@@ -29,51 +32,113 @@ def trace(root):
     return nodes, edges
 
 
-def draw_dot(root, format="png", rankdir="LR"):
+def create_nx_graph(root):
     """
-    Visualizes a computation graph using graphviz.
+    Creates a networkx graph from a computation graph.
 
     Args:
         root: The root node of the computation graph.
-        format: The output format (png, pdf, etc.)
-        rankdir: The direction of the graph layout (TB for top-bottom, LR for left-right)
 
     Returns:
-        Graphviz Digraph object.
+        A networkx DiGraph object.
     """
-    dot = Digraph(format=format, graph_attr={"rankdir": rankdir})
+    G = nx.DiGraph()
 
     nodes, edges = trace(root)
+
+    # Add nodes
     for n in nodes:
         uid = str(id(n))
-
-        # for any value in the graph, create a rectangular ('record') node for it
-        dot.node(
-            name=uid,
-            label=f"{{ data: {n.data:.4f} | grad: {n.grad:.4f} }}",
-            shape="record",
-        )
+        label = f"data: {n.data:.4f}\ngrad: {n.grad:.4f}"
+        G.add_node(uid, label=label, shape="box")
 
         if n._op:
-            # if this value is the result of some operation, create a node for the op
-            # and connect the input values to it, and then connect it to the output value
+            # Add operation node
             op_uid = uid + n._op
-            dot.node(name=op_uid, label=n._op)
-            dot.edge(op_uid, uid)
+            G.add_node(op_uid, label=n._op, shape="ellipse")
+            G.add_edge(op_uid, uid)
 
+            # Connect inputs to operation
             for child in n._prev:
-                dot.edge(str(id(child)), op_uid)
+                G.add_edge(str(id(child)), op_uid)
 
-    return dot
+    return G
 
 
-def visualize(root, name="computation_graph"):
+def draw_dot(root, output_file=None, format="png"):
+    """
+    Visualizes a computation graph using networkx and pydot.
+
+    Args:
+        root: The root node of the computation graph.
+        output_file: Path to save the output file (without extension).
+        format: The output format (png, pdf, etc.)
+
+    Returns:
+        The networkx DiGraph object.
+    """
+    G = create_nx_graph(root)
+
+    if output_file:
+        write_dot(G, f"{output_file}.dot")
+
+    return G
+
+
+def visualize(root, name="computation_graph", show=True):
     """
     Visualizes a computation graph and saves it to a file.
 
     Args:
         root: The root node of the computation graph.
         name: The output file name (without extension).
+        show: Whether to display the plot.
     """
-    dot = draw_dot(root)
-    dot.render(name, cleanup=True)
+    G = draw_dot(root, output_file=name)
+
+    plt.figure(figsize=(12, 8))
+
+    # Get node labels and shapes
+    node_labels = nx.get_node_attributes(G, "label")
+    node_shapes = nx.get_node_attributes(G, "shape")
+
+    write_dot(G, sys.stdout)
+
+    return
+
+    # Use graphviz_layout for better tree layout
+    pos = graphviz_layout(G, prog="dot")
+
+    # Draw nodes with different shapes
+    box_nodes = [n for n, s in node_shapes.items() if s == "box"]
+    ellipse_nodes = [n for n, s in node_shapes.items() if s == "ellipse"]
+
+    # Draw the graph
+    nx.draw_networkx_nodes(
+        G,
+        pos,
+        nodelist=box_nodes,
+        node_color="lightblue",
+        node_size=2000,
+        node_shape="s",
+    )
+    nx.draw_networkx_nodes(
+        G,
+        pos,
+        nodelist=ellipse_nodes,
+        node_color="lightgreen",
+        node_size=1500,
+        node_shape="o",
+    )
+    nx.draw_networkx_edges(G, pos, arrows=True, arrowsize=20)
+    nx.draw_networkx_labels(G, pos, labels=node_labels, font_size=8)
+
+    plt.axis("off")
+
+    if name:
+        plt.savefig(f"{name}.png", format="png", dpi=300, bbox_inches="tight")
+
+    if show:
+        plt.show()
+
+    return G

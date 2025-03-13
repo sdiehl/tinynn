@@ -1,7 +1,7 @@
 from tinynn.engine import Value
 from tinynn.nn import MLP
 
-# from tinynn.viz import visualize
+from tinynn.viz import visualize
 
 
 def demo_basic_operations():
@@ -38,8 +38,8 @@ def demo_basic_operations():
     print(f"f.grad = {f.grad}")
 
     # Visualize the computation graph
-    # print("\nGenerating computation graph visualization...")
-    # visualize(f, "basic_operations_graph")
+    print("\nGenerating computation graph visualization...")
+    visualize(f, "basic_operations_graph")
 
 
 def demo_simple_neural_network():
@@ -87,8 +87,8 @@ def demo_simple_neural_network():
     print(f"New loss: {loss.data}")
 
     # Visualize the computation graph
-    # print("\nGenerating computation graph visualization...")
-    # visualize(loss, "neural_network_graph")
+    print("\nGenerating computation graph visualization...")
+    visualize(loss, "neural_network_graph")
 
 
 def main():
