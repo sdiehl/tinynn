@@ -30,10 +30,10 @@ jobs:
         uv pip install --system ".[dev]"
     
     - name: Run black
-      run: black . --check
+      run: uv run black . --check
       
     - name: Run ruff
-      run: ruff check .
+      run: uv run ruff check .
       
     - name: Run mypy
-      run: mypy . 
+      run: uv run mypy . 
