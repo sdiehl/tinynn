@@ -1,6 +1,6 @@
 # TinyNN
 
-A minimalist neural network implementation in Python. Showing automatic differentiation and training.
+A minimalist neural network implementation in Python. Showing automatic differentiation and training. This is for teaching purposes, it's pure Python and very slow, but easy to understand.
 
 ## Installation
 
