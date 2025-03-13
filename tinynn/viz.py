@@ -1,7 +1,9 @@
 """
 Visualization utilities for drawing computation graphs.
 """
+
 from graphviz import Digraph
+
 
 def trace(root):
     """
@@ -26,7 +28,8 @@ def trace(root):
     build(root)
     return nodes, edges
 
-def draw_dot(root, format='png', rankdir='LR'):
+
+def draw_dot(root, format="png", rankdir="LR"):
     """
     Visualizes a computation graph using graphviz.
 
@@ -38,14 +41,18 @@ def draw_dot(root, format='png', rankdir='LR'):
     Returns:
         Graphviz Digraph object.
     """
-    dot = Digraph(format=format, graph_attr={'rankdir': rankdir})
+    dot = Digraph(format=format, graph_attr={"rankdir": rankdir})
 
     nodes, edges = trace(root)
     for n in nodes:
         uid = str(id(n))
 
         # for any value in the graph, create a rectangular ('record') node for it
-        dot.node(name=uid, label=f"{{ data: {n.data:.4f} | grad: {n.grad:.4f} }}", shape='record')
+        dot.node(
+            name=uid,
+            label=f"{{ data: {n.data:.4f} | grad: {n.grad:.4f} }}",
+            shape="record",
+        )
 
         if n._op:
             # if this value is the result of some operation, create a node for the op
@@ -59,7 +66,8 @@ def draw_dot(root, format='png', rankdir='LR'):
 
     return dot
 
-def visualize(root, name='computation_graph'):
+
+def visualize(root, name="computation_graph"):
     """
     Visualizes a computation graph and saves it to a file.
 

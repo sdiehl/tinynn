@@ -1,24 +1,21 @@
-
 """
-Neural network example using MicroAutograd.
-
-This example demonstrates training a simple neural network on a toy dataset
-using the MicroAutograd library.
+Toy neural network example
 """
+
 import sys
 import os
 import random
-import math
 from sklearn.datasets import make_moons
 import numpy as np
 import matplotlib.pyplot as plt
 
 # Add the parent directory to the path so we can import our library
-sys.path.append(os.path.abspath('.'))
+sys.path.append(os.path.abspath("."))
 
-from micrograd.engine import Value
-from micrograd.nn import MLP
-from micrograd.optim import SGD
+from tinynn.engine import Value
+from tinynn.nn import MLP
+from tinynn.optim import SGD
+
 
 def generate_data(n_samples=100, noise=0.1):
     """Generate a simple dataset where the classes are easily separable"""
@@ -26,7 +23,8 @@ def generate_data(n_samples=100, noise=0.1):
     X, y = make_moons(n_samples=n_samples, noise=noise, random_state=42)
     return X, y
 
-def plot_decision_boundary(model, X, y, title='Decision Boundary'):
+
+def plot_decision_boundary(model, X, y, title="Decision Boundary"):
     """
     Plot the decision boundary of a binary classifier.
 
@@ -40,8 +38,7 @@ def plot_decision_boundary(model, X, y, title='Decision Boundary'):
     h = 0.25
     x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
     y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
-                         np.arange(y_min, y_max, h))
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
 
     # Create mesh of input points
     Xmesh = np.c_[xx.ravel(), yy.ravel()]
@@ -61,15 +58,16 @@ def plot_decision_boundary(model, X, y, title='Decision Boundary'):
     plt.contourf(xx, yy, Z, cmap=plt.cm.Spectral, alpha=0.8)
 
     # Data points
-    plt.scatter(X[:, 0], X[:, 1], c=y, s=40, cmap=plt.cm.Spectral, edgecolors='k')
+    plt.scatter(X[:, 0], X[:, 1], c=y, s=40, cmap=plt.cm.Spectral, edgecolors="k")
 
     plt.xlim(xx.min(), xx.max())
     plt.ylim(yy.min(), yy.max())
     plt.title(title)
-    plt.xlabel('X1')
-    plt.ylabel('X2')
-    plt.savefig('decision_boundary.png')
+    plt.xlabel("X1")
+    plt.ylabel("X2")
+    plt.savefig("decision_boundary.png")
     plt.close()
+
 
 def main():
     """Run the neural network example."""
@@ -158,7 +156,9 @@ def main():
 
         # Print progress every 10 epochs
         if (epoch + 1) % 10 == 0:
-            print(f"Epoch {epoch+1}/{n_epochs}: Loss={avg_loss:.4f}, Accuracy={accuracy:.4f}")
+            print(
+                f"Epoch {epoch+1}/{n_epochs}: Loss={avg_loss:.4f}, Accuracy={accuracy:.4f}"
+            )
 
         # Early stopping if we reach perfect accuracy
         if accuracy == 1.0 and avg_loss < 0.01:
@@ -170,26 +170,27 @@ def main():
 
     plt.subplot(1, 2, 1)
     plt.plot(losses)
-    plt.title('Training Loss')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
+    plt.title("Training Loss")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
 
     plt.subplot(1, 2, 2)
     plt.plot(accuracies)
-    plt.title('Training Accuracy')
-    plt.xlabel('Epoch')
-    plt.ylabel('Accuracy')
+    plt.title("Training Accuracy")
+    plt.xlabel("Epoch")
+    plt.ylabel("Accuracy")
 
     plt.tight_layout()
-    plt.savefig('training_progress.png')
+    plt.savefig("training_progress.png")
     plt.close()
 
     print("Training complete!")
     print(f"Final accuracy: {accuracies[-1]:.4f}")
 
     # Plot decision boundary
-    plot_decision_boundary(model, X, y, title='Neural Network Decision Boundary')
+    plot_decision_boundary(model, X, y, title="Neural Network Decision Boundary")
     print("Decision boundary plot saved to 'decision_boundary.png'")
+
 
 if __name__ == "__main__":
     main()

@@ -1,12 +1,14 @@
 """
 Neural network module built on top of the autograd engine.
 """
+
 import random
 from .engine import Value
 
+
 class Module:
     """Base class for all neural network modules."""
-    
+
     def zero_grad(self):
         """Sets gradients of all parameters to zero."""
         for p in self.parameters():
@@ -16,15 +18,16 @@ class Module:
         """Returns a list of all parameters in the module."""
         return []
 
+
 class Neuron(Module):
     """
     A single neuron with multiple inputs and one output.
     """
-    
+
     def __init__(self, nin, nonlin=True):
         """
         Initialize a neuron with 'nin' inputs.
-        
+
         Args:
             nin: Number of inputs
             nonlin: Whether to apply non-linearity (ReLU)
@@ -35,7 +38,7 @@ class Neuron(Module):
 
     def __call__(self, x):
         """Forward pass: compute the output of the neuron for the given input."""
-        act = sum((wi*xi for wi, xi in zip(self.w, x)), self.b)
+        act = sum((wi * xi for wi, xi in zip(self.w, x)), self.b)
         return act.relu() if self.nonlin else act
 
     def parameters(self):
@@ -45,15 +48,16 @@ class Neuron(Module):
     def __repr__(self):
         return f"{'ReLU' if self.nonlin else 'Linear'}Neuron({len(self.w)})"
 
+
 class Layer(Module):
     """
     A layer of neurons, where each neuron has the same number of inputs.
     """
-    
+
     def __init__(self, nin, nout, **kwargs):
         """
         Initialize a layer with 'nin' inputs and 'nout' neurons.
-        
+
         Args:
             nin: Number of inputs to each neuron
             nout: Number of neurons (outputs)
@@ -73,21 +77,25 @@ class Layer(Module):
     def __repr__(self):
         return f"Layer of [{', '.join(str(n) for n in self.neurons)}]"
 
+
 class MLP(Module):
     """
     Multi-layer perceptron (fully connected feed-forward neural network).
     """
-    
+
     def __init__(self, nin, nouts):
         """
         Initialize a multi-layer perceptron.
-        
+
         Args:
             nin: Number of inputs
             nouts: List of number of neurons in each layer
         """
         sz = [nin] + nouts
-        self.layers = [Layer(sz[i], sz[i+1], nonlin=i!=len(nouts)-1) for i in range(len(nouts))]
+        self.layers = [
+            Layer(sz[i], sz[i + 1], nonlin=i != len(nouts) - 1)
+            for i in range(len(nouts))
+        ]
 
     def __call__(self, x):
         """Forward pass: compute the output of the network for the given input."""

@@ -1,12 +1,8 @@
-"""
-Simple demo of MicroAutograd functionality
-"""
-import math
-import numpy as np
-import matplotlib.pyplot as plt
-from micrograd.engine import Value
-from micrograd.nn import MLP
-from micrograd.viz import visualize
+from tinynn.engine import Value
+from tinynn.nn import MLP
+
+# from tinynn.viz import visualize
+
 
 def demo_basic_operations():
     """Demonstrate basic autograd operations"""
@@ -18,9 +14,12 @@ def demo_basic_operations():
     c = Value(10.0, label="c")
 
     # Perform operations
-    d = a * b; d.label = "d"
-    e = d + c; e.label = "e"
-    f = e.relu(); f.label = "f"
+    d = a * b
+    d.label = "d"
+    e = d + c
+    e.label = "e"
+    f = e.relu()
+    f.label = "f"
 
     print(f"a = {a.data}, b = {b.data}, c = {c.data}")
     print(f"d = a * b = {d.data}")
@@ -39,8 +38,9 @@ def demo_basic_operations():
     print(f"f.grad = {f.grad}")
 
     # Visualize the computation graph
-    print("\nGenerating computation graph visualization...")
-    visualize(f, "basic_operations_graph")
+    # print("\nGenerating computation graph visualization...")
+    # visualize(f, "basic_operations_graph")
+
 
 def demo_simple_neural_network():
     """Demonstrate a very simple neural network without external data"""
@@ -64,7 +64,7 @@ def demo_simple_neural_network():
 
     # Define a target and compute loss
     y_true = 0.5
-    loss = (y_pred_value - y_true)**2
+    loss = (y_pred_value - y_true) ** 2
 
     print(f"Target: {y_true}")
     print(f"Loss: {loss.data}")
@@ -80,23 +80,24 @@ def demo_simple_neural_network():
     # Second forward pass after weight update
     y_pred = model(x)
     y_pred_value = y_pred[0] if isinstance(y_pred, list) else y_pred
-    loss = (y_pred_value - y_true)**2
+    loss = (y_pred_value - y_true) ** 2
 
-    print(f"\nAfter one gradient descent step:")
+    print("\nAfter one gradient descent step:")
     print(f"New prediction: {y_pred_value.data}")
     print(f"New loss: {loss.data}")
 
     # Visualize the computation graph
-    print("\nGenerating computation graph visualization...")
-    visualize(loss, "neural_network_graph")
+    # print("\nGenerating computation graph visualization...")
+    # visualize(loss, "neural_network_graph")
+
 
 def main():
-    """Main function to demonstrate MicroAutograd functionality"""
     # Run the basic operations demo
     demo_basic_operations()
 
     # Run the simple neural network demo
     demo_simple_neural_network()
+
 
 if __name__ == "__main__":
     main()

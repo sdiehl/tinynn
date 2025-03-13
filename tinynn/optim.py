@@ -1,20 +1,6 @@
-"""
-Optimization algorithms for neural networks.
-"""
-
 class SGD:
-    """
-    Stochastic Gradient Descent optimizer.
-    """
 
     def __init__(self, parameters, lr=0.01):
-        """
-        Initialize the SGD optimizer.
-
-        Args:
-            parameters: List of parameters to optimize
-            lr: Learning rate
-        """
         self.parameters = parameters
         self.lr = lr
 

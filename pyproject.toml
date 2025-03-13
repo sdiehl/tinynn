@@ -10,3 +10,9 @@ dependencies = [
     "pydot>=3.0.4",
     "scikit-learn>=1.6.1",
 ]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "ruff>=0.9.10",
+]
