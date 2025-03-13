@@ -4,7 +4,7 @@ import math
 class Value:
     def __init__(self, data, _children=(), _op="", label=""):
         self.data = data
-        self.grad = 0
+        self.grad = 0.0
         self.label = label
         # internal variables used for autograd graph construction
         self._backward = lambda: None
@@ -99,14 +99,14 @@ class Value:
         topo = []
         visited = set()
 
-        def build_topo(v):
+        def topo_sort(v):
             if v not in visited:
                 visited.add(v)
                 for child in v._prev:
-                    build_topo(child)
+                    topo_sort(child)
                 topo.append(v)
 
-        build_topo(self)
+        topo_sort(self)
 
         # go one variable at a time and apply the chain rule to get its gradient
         self.grad = 1

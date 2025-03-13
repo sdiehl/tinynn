@@ -9,6 +9,20 @@ git clone https://github.com/sdiehl/tinynn.git
 uv sync
 ```
 
+## Examples
+
+Run the automatic differentiation example:
+
+```bash
+uv run main.py
+```
+
+Run the training example:
+
+```bash
+uv run train.py
+```
+
 ## Usage
 
 Basic example of creating and training a neural network:

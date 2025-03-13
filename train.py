@@ -1,4 +1,4 @@
-from sklearn.datasets import make_moons
+from sklearn.datasets import make_moons  # type: ignore
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -35,10 +35,10 @@ def plot_decision_boundary(model, X, y, title="Decision Boundary"):
     plt.figure(figsize=(10, 8))
 
     # Color regions using spectral colormap
-    plt.contourf(xx, yy, Z, cmap=plt.cm.Spectral, alpha=0.8)
+    plt.contourf(xx, yy, Z, cmap=plt.cm.Spectral, alpha=0.8)  # type: ignore
 
     # Data points
-    plt.scatter(X[:, 0], X[:, 1], c=y, s=40, cmap=plt.cm.Spectral, edgecolors="k")
+    plt.scatter(X[:, 0], X[:, 1], c=y, s=40, cmap=plt.cm.Spectral, edgecolors="k")  # type: ignore
 
     plt.xlim(xx.min(), xx.max())
     plt.ylim(yy.min(), yy.max())

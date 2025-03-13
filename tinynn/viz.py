@@ -6,6 +6,7 @@ from io import StringIO
 import networkx as nx  # type: ignore
 from networkx.drawing.nx_pydot import write_dot  # type: ignore
 import matplotlib.pyplot as plt
+from typing import Any
 
 
 def trace(root):
@@ -85,7 +86,7 @@ def draw_dot(root, output_file=None, format="png"):
     return G
 
 
-def visualize(root, name="computation_graph", show=True) -> str:
+def visualize(root: Any, name: str = "computation_graph", show: bool = True) -> str:
     """
     Visualizes a computation graph and saves it to a file.
 
